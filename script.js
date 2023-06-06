@@ -7,7 +7,7 @@ $(document).ready(function(){
         success: function (response, textStatus) {
             $('#todo-list').empty();
             response.tasks.forEach(function (task) {
-                $('#todo-list').append('<div class="row"><p class="col-xs-8">' + task.content + '</p><button class="delete" data-id="' + task.id + '">Delete</button><input type="checkbox" class="mark-complete" data-id="' + task.id + '"' + (task.completed ? 'checked' : '') + '>');
+                $('#todo-list').append('<div class="row"><p class="col-xs-8">' + task.content + '</p><input type="checkbox" class="mark-complete" data-id="' + task.id + '"' + (task.completed ? 'checked' : '') + '><button class="delete" data-id="' + task.id + '">Delete</button>');
               });
         },
         error: function (request, textStatus, errorMessage) {
@@ -95,6 +95,84 @@ $(document).ready(function(){
           }
         });
       }
+
+
+      var getAndDisplayActiveTasks = function() {
+        $.ajax({
+          type: 'GET',
+          url: 'https://fewd-todolist-api.onrender.com/tasks?api_key=210',
+          dataType: 'json',
+          success: function(response, textStatus) {
+            $('#todo-list').empty();
+            response.tasks.forEach(function(task) {
+              if (!task.completed) {
+                $('#todo-list').append('<div class="row"><p class="col-xs-8">' + task.content + '</p><input type="checkbox" class="mark-complete" data-id="' + task.id + '"' + (task.completed ? 'checked' : '') + '><button class="delete" data-id="' + task.id + '">Delete</button>');
+              }
+            });
+          },
+          error: function(request, textStatus, errorMessage) {
+            console.log(errorMessage);
+          }
+        });
+      };
+      
+      var getAndDisplayCompletedTasks = function() {
+        $.ajax({
+          type: 'GET',
+          url: 'https://fewd-todolist-api.onrender.com/tasks?api_key=210',
+          dataType: 'json',
+          success: function(response, textStatus) {
+            $('#todo-list').empty();
+            response.tasks.forEach(function(task) {
+              if (task.completed) {
+                $('#todo-list').append('<div class="row"><p class="col-xs-8">' + task.content + '</p><input type="checkbox" class="mark-complete" data-id="' + task.id + '"' + (task.completed ? 'checked' : '') + '><button class="delete" data-id="' + task.id + '">Delete</button>');
+              }
+            });
+          },
+          error: function(request, textStatus, errorMessage) {
+            console.log(errorMessage);
+          }
+        });
+      };
+      
+      var sortTasksByDate = function() {
+        $.ajax({
+          type: 'GET',
+          url: 'https://fewd-todolist-api.onrender.com/tasks?api_key=210',
+          dataType: 'json',
+          success: function(response, textStatus) {
+            response.tasks.sort(function(a, b) {
+              var dateA = new Date(a.date);
+              var dateB = new Date(b.date);
+              return dateA - dateB;
+            });
+      
+            $('#todo-list').empty();
+            response.tasks.forEach(function(task) {
+              $('#todo-list').append('<div class="row"><p class="col-xs-8">' + task.content + '</p><input type="checkbox" class="mark-complete" data-id="' + task.id + '"' + (task.completed ? 'checked' : '') + '><button class="delete" data-id="' + task.id + '">Delete</button>');
+            });
+          },
+          error: function(request, textStatus, errorMessage) {
+            console.log(errorMessage);
+          }
+        });
+      };
+
+      $('#sort').on('click', function() {
+        sortTasksByDate();
+      });
+
+      $('#all').on('click', function() {
+        getAndDisplayAllTasks();
+      });
+      
+      $('#active').on('click', function() {
+        getAndDisplayActiveTasks();
+      });
+      
+      $('#completed').on('click', function() {
+        getAndDisplayCompletedTasks();
+      });
 
        getAndDisplayAllTasks();
 
